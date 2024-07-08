@@ -21,7 +21,7 @@ yt.on("notify", async (data) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      content: data,
+      content: `New video from [${data.channel.name}](${data.channel.link})\n**${data.video.title}**\n${data.video.link}`,
     }),
   });
 });

@@ -65,7 +65,7 @@ export class YoutubePubsub extends EventEmitter<EventMap> {
     console.log("\nWaiting for all subscriptions to close...");
     // Wait for all subscriptions to close with 30 seconds timeout
     await Promise.race([
-      new Promise((resolve) => setTimeout(resolve, 10_000)),
+      new Promise((resolve) => setTimeout(resolve, 30_000)),
       new Promise<void>((resolve) => {
         if (getChannels().length === 0) resolve();
         this.once("close", resolve);
@@ -123,7 +123,7 @@ export class YoutubePubsub extends EventEmitter<EventMap> {
 
   private async handleNotification(req: Request) {
     const xml = await req.text();
-    const parser = new XMLParser();
+    const parser = new XMLParser({ ignoreAttributes: false });
     const data = parser.parse(xml, {
       allowBooleanAttributes: true,
     });
@@ -156,7 +156,7 @@ export class YoutubePubsub extends EventEmitter<EventMap> {
       return new Response("OK", { status: 200 });
     }
 
-    const videoId = video["yt:videoid"];
+    const videoId = video["yt:videoId"];
     const publishTIme = new Date(video.published);
     const updateTime = new Date(video.updated);
 
@@ -164,10 +164,10 @@ export class YoutubePubsub extends EventEmitter<EventMap> {
       video: {
         id: videoId,
         title: video.title,
-        link: video.link,
+        link: video.link["@_href"],
       },
       channel: {
-        id: video["yt:channelid"],
+        id: video["yt:channelId"],
         name: video.author.name,
         link: video.author.uri,
       },
